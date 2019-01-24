@@ -84,20 +84,20 @@ class Frame : private Packets...
 
    template<auto id, typename T>
    void
-   set(const T& value)
+   inject(const T& value)
    {
       using packet_type = typename details::frame::lookup_packet<decltype(id), Packets...>::type;
       constexpr std::size_t base_offset{offset<decltype(id)>::value};
-      packet_type::set<id>(value);
+      packet_type::inject<id>(value);
    }
 
    template<auto id, typename T>
    void
-   get(T& value) const
+   extract(T& value) const
    {
       using packet_type = typename details::frame::lookup_packet<decltype(id), Packets...>::type;
       constexpr std::size_t base_offset{offset<decltype(id)>::value};
-      packet_type::get<id>(value);
+      packet_type::extract<id>(value);
    }
 };
 

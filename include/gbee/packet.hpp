@@ -23,6 +23,7 @@
 #include <cstring>
 #include <gbee/helpers.hpp>
 #include <type_traits>
+#include <array>
 
 namespace gbee {
 
@@ -94,14 +95,14 @@ class Packet
 
    template<auto id>
    void
-   set(const typename lookup_field<id>::value_type& value, std::size_t base_offset = 0)
+   inject(const typename lookup_field<id>::value_type& value, std::size_t base_offset = 0)
    {
       std::memcpy((void*) (0 + base_offset + offset<id>::value), &value, lookup_field<id>::size);
    }
 
    template<auto id>
    void
-   get(typename lookup_field<id>::value_type& value, std::size_t base_offset = 0) const
+   extract(typename lookup_field<id>::value_type& value, std::size_t base_offset = 0) const
    {
       std::memcpy(&value, (void*) (0 + base_offset + offset<id>::value), lookup_field<id>::size);
    }
