@@ -17,5 +17,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include <gbee/gbee.hpp>
-#include <gtest/gtest.h>
+#pragma once
+
+#include <gbee/frame.hpp>
+#include <gbee/helpers.hpp>
+#include <gbee/packet.hpp>

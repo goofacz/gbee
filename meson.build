@@ -1,7 +1,9 @@
-project('gbee',
-        'cpp',
-        version : '0.1',
-        license : 'GPL3',
+project(
+    'gbee',
+    'cpp',
+    version : '0.1',
+    license : 'GPL3',
+    default_options : ['cpp_std=c++17']
 )
 
 gbee_headers = declare_dependency(
@@ -9,6 +11,9 @@ gbee_headers = declare_dependency(
 )
 
 install_headers(
-    'include/gbee.hpp', 
+    'include/gbee/gbee.hpp',
+    'include/gbee/packet.hpp',
+    'include/gbee/frame.hpp',
+    'include/gbee/helpers.hpp',
     subdir: 'gbee'
 )

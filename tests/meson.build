@@ -1,6 +1,7 @@
 project(
     'gbee-tests',
-    'cpp'
+    'cpp',
+    default_options : ['cpp_std=c++17']
 )
 
 gtest = dependency(
@@ -16,6 +17,7 @@ endif
 target = executable(
     'unit-tests',
     'packet.cpp',
+    include_directories: include_directories('../include'),
     dependencies : gtest
 )
 
