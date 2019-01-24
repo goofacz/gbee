@@ -17,6 +17,7 @@ endif
 target = executable(
     'unit-tests',
     'packet.cpp',
+    'helpers.cpp',
     include_directories: include_directories('../include'),
     dependencies : gtest
 )
