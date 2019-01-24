@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <gbee/gbee.hpp>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <type_traits>
 
@@ -26,10 +27,14 @@ enum class Foo
 {
    A = 4,
    B,
-   C
+   C,
+   D
 };
 
 using namespace gbee;
+
+using FooPacket =
+  Packet<Field<Foo::A, std::uint16_t>, Field<Foo::B, std::uint32_t>, Field<Foo::C, std::uint8_t>>;
 
 TEST(Field, validate)
 {
@@ -37,4 +42,13 @@ TEST(Field, validate)
    EXPECT_EQ(Bar::id, Foo::B);
    EXPECT_EQ(Bar::size, sizeof(uint16_t));
    EXPECT_TRUE((std::is_same_v<Bar::value_type, uint16_t>) );
+}
+
+TEST(Field, inject)
+{
+   std::uint32_t value{0xabcdef12};
+   std::array<std::uint8_t, 7> buffer{{0}};
+
+   FooPacket::inject<Foo::B>(buffer, value);
+   EXPECT_THAT(buffer, ::testing::ElementsAre(0x00, 0x00, 0x12, 0xef, 0xcd, 0xab, 0x00));
 }
