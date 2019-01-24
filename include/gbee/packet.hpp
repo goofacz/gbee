@@ -19,11 +19,11 @@
 
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstring>
 #include <gbee/helpers.hpp>
 #include <type_traits>
-#include <array>
 
 namespace gbee {
 
@@ -93,16 +93,20 @@ class Packet
 
    static constexpr std::size_t size{(lookup_field<Fields::id>::size + ...)};
 
-   template<auto id>
-   void
-   inject(const typename lookup_field<id>::value_type& value, std::size_t base_offset = 0)
+   template<auto id, std::size_t buffer_size>
+   static void
+   inject(std::array<std::uint8_t, buffer_size>& buffer,
+          const typename lookup_field<id>::value_type& value,
+          std::size_t base_offset = 0)
    {
-      std::memcpy((void*) (0 + base_offset + offset<id>::value), &value, lookup_field<id>::size);
+      static_assert(buffer_size >= size);
+      const size_t field_offset{base_offset + offset<id>::value};
+      std::memcpy(buffer.data() + field_offset, &value, lookup_field<id>::size);
    }
 
    template<auto id>
-   void
-   extract(typename lookup_field<id>::value_type& value, std::size_t base_offset = 0) const
+   static void
+   extract(typename lookup_field<id>::value_type& value, std::size_t base_offset = 0)
    {
       std::memcpy(&value, (void*) (0 + base_offset + offset<id>::value), lookup_field<id>::size);
    }
