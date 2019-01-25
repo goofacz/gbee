@@ -88,6 +88,9 @@ class Packet
    struct offset : public details::packet::offset<id, Fields...>
    {};
 
+   template<auto id>
+   using field_valie_type = typename lookup_field<id>::value_type;
+
  public:
    using id_type = std::decay_t<decltype((Fields::id, ...))>;
 
@@ -96,7 +99,7 @@ class Packet
    template<auto id, std::size_t buffer_size>
    static void
    inject(std::array<std::uint8_t, buffer_size>& buffer,
-          const typename lookup_field<id>::value_type& value,
+          const field_valie_type<id>& value,
           std::size_t base_offset = 0)
    {
       static_assert(buffer_size >= size);
@@ -106,7 +109,7 @@ class Packet
 
    template<auto id>
    static void
-   extract(typename lookup_field<id>::value_type& value, std::size_t base_offset = 0)
+   extract(field_valie_type<id>& value, std::size_t base_offset = 0)
    {
       std::memcpy(&value, (void*) (0 + base_offset + offset<id>::value), lookup_field<id>::size);
    }
