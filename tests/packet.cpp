@@ -48,7 +48,7 @@ TEST(Field, validate)
    EXPECT_TRUE((std::is_same_v<Bar::value_type, uint16_t>) );
 }
 
-TEST(Field, inject)
+TEST(Packet, inject)
 {
    std::array<std::uint8_t, 16> buffer{{0}};
    static_assert(buffer.size() >= FooPacket::size);
@@ -79,7 +79,7 @@ TEST(Field, inject)
                                               0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x55));
 }
 
-TEST(Field, extract)
+TEST(Packet, extract)
 {
    const std::array<uint8_t, 16> buffer{{0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x44, 0x44, 0x44,
                                          0x44, 0x44, 0x44, 0x44, 0x44, 0x55}};

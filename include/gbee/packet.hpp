@@ -75,11 +75,12 @@ struct Field
 };
 
 template<typename... Fields>
-class Packet
+struct Packet
 {
    static_assert(are_values_unique<Fields::id...>);
 
- private:
+   Packet() = delete;
+
    template<auto id>
    struct lookup_field : public details::packet::lookup_field<id, Fields...>::type
    {};
@@ -91,12 +92,11 @@ class Packet
    template<auto id>
    using field_value_type = typename lookup_field<id>::value_type;
 
- public:
-   using id_type = std::tuple_element_t<0, std::tuple<decltype(Fields::id)...>>;
+   using id_type = std::decay_t<decltype((Fields::id, ...))>;
 
    static constexpr std::size_t size{(lookup_field<Fields::id>::size + ...)};
 
-   template<auto id, typename T>
+   template<id_type id, typename T>
    static void
    inject(std::uint8_t* buffer,
           std::size_t buffer_size,
@@ -108,7 +108,7 @@ class Packet
       std::memcpy(buffer + field_offset, &value, lookup_field<id>::size);
    }
 
-   template<auto id, typename T>
+   template<id_type id, typename T>
    static void
    extract(const std::uint8_t* buffer,
            std::size_t buffer_size,
