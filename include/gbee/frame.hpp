@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <gbee/helpers.hpp>
 #include <type_traits>
@@ -66,7 +67,7 @@ struct offset : public offset_helper<false, Id, 0, Packets...>
 } // namespace details::frame
 
 template<typename... Packets>
-class Frame : private Packets...
+class Frame
 {
    static_assert(are_types_unique<typename Packets::id_type...>);
 
@@ -82,23 +83,39 @@ class Frame : private Packets...
  public:
    static constexpr std::size_t size{(lookup_packet<typename Packets::Id>::size + ...)};
 
+   template<std::size_t array_size>
+   explicit Frame(std::array<std::uint8_t, array_size>& initial_buffer)
+     : buffer{initial_buffer.data()}, buffer_size{array_size}
+   {
+      // TODO Throw exception if array_size < size?
+   }
+
+   bool
+   has_valid_buffer_size() const
+   {
+      return buffer_size <= size;
+   }
+
    template<auto id, typename T>
-   static void
+   void
    inject(const T& value)
    {
       using packet_type = typename details::frame::lookup_packet<decltype(id), Packets...>::type;
       constexpr std::size_t base_offset{offset<decltype(id)>::value};
-      packet_type::inject<id>(value);
+      packet_type::template inject<id>(buffer, buffer_size, value, base_offset);
    }
 
    template<auto id, typename T>
-   static void
-   extract(T& value)
+   void
+   extract(T& value) const
    {
       using packet_type = typename details::frame::lookup_packet<decltype(id), Packets...>::type;
       constexpr std::size_t base_offset{offset<decltype(id)>::value};
-      packet_type::extract<id>(value);
+      packet_type::template extract<id>(buffer, buffer_size, value, base_offset);
    }
+
+   std::uint8_t* buffer;
+   const std::size_t buffer_size;
 };
 
 } // namespace gbee
