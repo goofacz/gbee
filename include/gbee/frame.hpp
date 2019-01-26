@@ -28,8 +28,7 @@ namespace gbee {
 
 namespace details::frame {
 template<typename Id, typename Group>
-struct lookup_group_base
-  : public std::enable_if<std::is_same_v<Id, typename Group::id_type>, Group>
+struct lookup_group_base : public std::enable_if<std::is_same_v<Id, typename Group::id_type>, Group>
 {};
 
 template<typename Id, typename... Groups>
@@ -46,11 +45,11 @@ struct offset_helper<true, Id, current_value, Group, Groups...>
 
 template<typename Id, std::size_t current_value, typename Group, typename... Groups>
 struct offset_helper<false, Id, current_value, Group, Groups...>
-  : public offset_helper<
-      std::is_same_v<typename Group::id_type, Id>,
-      Id,
-      std::is_same_v<typename Group::id_type, Id> ? current_value : current_value + Group::size,
-      Groups...>
+  : public offset_helper<std::is_same_v<typename Group::id_type, Id>,
+                         Id,
+                         std::is_same_v<typename Group::id_type, Id> ? current_value
+                                                                     : current_value + Group::size,
+                         Groups...>
 {};
 
 template<bool found, typename Id, std::size_t current_value>
@@ -93,7 +92,7 @@ class Frame
    bool
    has_valid_buffer_size() const
    {
-      return buffer_size <= size;
+      return buffer_size >= size;
    }
 
    template<auto id, typename T>

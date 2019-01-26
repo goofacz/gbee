@@ -52,6 +52,23 @@ using FooGroup3 = Group<Field<Foo3::F, std::uint32_t>>;
 
 using FooFrame = Frame<FooGroup1, FooGroup2, FooGroup3>;
 
+TEST(Frame, has_valid_buffer_size)
+{
+   using Sample1 = Frame<FooGroup1>;
+   std::array<std::uint8_t, 6> sample1_buffer{{0}};
+   Sample1 sample1_frame{sample1_buffer};
+   EXPECT_TRUE(sample1_frame.has_valid_buffer_size());
+
+   using Sample2 = Frame<FooGroup1, FooGroup3>;
+   std::array<std::uint8_t, 10> sample2_buffer{{0}};
+   Sample2 sample2_frame{sample2_buffer};
+   EXPECT_TRUE(sample2_frame.has_valid_buffer_size());
+
+   std::array<std::uint8_t, 20> foo_buffer{{0}};
+   FooFrame foo_frame{foo_buffer};
+   EXPECT_TRUE(foo_frame.has_valid_buffer_size());
+}
+
 TEST(Frame, inject)
 {
    std::array<std::uint8_t, 20> buffer{{0}};
