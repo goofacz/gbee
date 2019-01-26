@@ -21,4 +21,4 @@
 
 #include <gbee/frame.hpp>
 #include <gbee/helpers.hpp>
-#include <gbee/packet.hpp>
+#include <gbee/group.hpp>

@@ -27,30 +27,30 @@
 namespace gbee {
 
 namespace details::frame {
-template<typename Id, typename Packet>
-struct lookup_packet_base
-  : public std::enable_if<std::is_same_v<Id, typename Packet::id_type>, Packet>
+template<typename Id, typename Group>
+struct lookup_group_base
+  : public std::enable_if<std::is_same_v<Id, typename Group::id_type>, Group>
 {};
 
-template<typename Id, typename... Packets>
-struct lookup_packet : public lookup_packet_base<Id, Packets>...
+template<typename Id, typename... Groups>
+struct lookup_group : public lookup_group_base<Id, Groups>...
 {};
 
 template<bool found, typename Id, std::size_t current_value, typename...>
 struct offset_helper;
 
-template<typename Id, std::size_t current_value, typename Packet, typename... Packets>
-struct offset_helper<true, Id, current_value, Packet, Packets...>
-  : public offset_helper<true, Id, current_value, Packets...>
+template<typename Id, std::size_t current_value, typename Group, typename... Groups>
+struct offset_helper<true, Id, current_value, Group, Groups...>
+  : public offset_helper<true, Id, current_value, Groups...>
 {};
 
-template<typename Id, std::size_t current_value, typename Packet, typename... Packets>
-struct offset_helper<false, Id, current_value, Packet, Packets...>
+template<typename Id, std::size_t current_value, typename Group, typename... Groups>
+struct offset_helper<false, Id, current_value, Group, Groups...>
   : public offset_helper<
-      std::is_same_v<typename Packet::id_type, Id>,
+      std::is_same_v<typename Group::id_type, Id>,
       Id,
-      std::is_same_v<typename Packet::id_type, Id> ? current_value : current_value + Packet::size,
-      Packets...>
+      std::is_same_v<typename Group::id_type, Id> ? current_value : current_value + Group::size,
+      Groups...>
 {};
 
 template<bool found, typename Id, std::size_t current_value>
@@ -60,28 +60,28 @@ struct offset_helper<found, Id, current_value>
    static constexpr std::size_t value{current_value};
 };
 
-template<typename Id, typename... Packets>
-struct offset : public offset_helper<false, Id, 0, Packets...>
+template<typename Id, typename... Groups>
+struct offset : public offset_helper<false, Id, 0, Groups...>
 {};
 
 } // namespace details::frame
 
-template<typename... Packets>
+template<typename... Groups>
 class Frame
 {
-   static_assert(are_types_unique<typename Packets::id_type...>);
+   static_assert(are_types_unique<typename Groups::id_type...>);
 
  private:
    template<typename Id>
-   struct lookup_packet : public details::frame::lookup_packet<Id, Packets...>::type
+   struct lookup_group : public details::frame::lookup_group<Id, Groups...>::type
    {};
 
    template<typename Id>
-   struct offset : public details::frame::offset<Id, Packets...>
+   struct offset : public details::frame::offset<Id, Groups...>
    {};
 
  public:
-   static constexpr std::size_t size{(lookup_packet<typename Packets::id_type>::size + ...)};
+   static constexpr std::size_t size{(lookup_group<typename Groups::id_type>::size + ...)};
 
    template<std::size_t array_size>
    explicit Frame(std::array<std::uint8_t, array_size>& initial_buffer)
@@ -100,18 +100,18 @@ class Frame
    void
    inject(const T& value)
    {
-      using packet_type = typename details::frame::lookup_packet<decltype(id), Packets...>::type;
+      using group_type = typename details::frame::lookup_group<decltype(id), Groups...>::type;
       constexpr std::size_t base_offset{offset<decltype(id)>::value};
-      packet_type::template inject<id>(buffer, buffer_size, value, base_offset);
+      group_type::template inject<id>(buffer, buffer_size, value, base_offset);
    }
 
    template<auto id, typename T>
    void
    extract(T& value) const
    {
-      using packet_type = typename details::frame::lookup_packet<decltype(id), Packets...>::type;
+      using group_type = typename details::frame::lookup_group<decltype(id), Groups...>::type;
       constexpr std::size_t base_offset{offset<decltype(id)>::value};
-      packet_type::template extract<id>(buffer, buffer_size, value, base_offset);
+      group_type::template extract<id>(buffer, buffer_size, value, base_offset);
    }
 
    std::uint8_t* buffer;

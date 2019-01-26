@@ -7,7 +7,7 @@ gmock = dependency('gmock',
                    required : true)
 
 target = executable('unit-tests',
-                    ['packet.cpp', 'helpers.cpp', 'frame.cpp'],
+                    ['group.cpp', 'helpers.cpp', 'frame.cpp'],
                     include_directories: gbee_include,
                     dependencies : [gtest, gmock])
 

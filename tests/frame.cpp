@@ -43,14 +43,14 @@ enum class Foo3
 
 using namespace gbee;
 
-using FooPacket1 = Packet<Field<Foo1::A, std::uint16_t>, Field<Foo1::B, std::uint32_t>>;
+using FooGroup1 = Group<Field<Foo1::A, std::uint16_t>, Field<Foo1::B, std::uint32_t>>;
 
-using FooPacket2 =
-  Packet<Field<Foo2::C, std::uint8_t>, Field<Foo2::D, std::uint64_t>, Field<Foo2::E, std::uint8_t>>;
+using FooGroup2 =
+  Group<Field<Foo2::C, std::uint8_t>, Field<Foo2::D, std::uint64_t>, Field<Foo2::E, std::uint8_t>>;
 
-using FooPacket3 = Packet<Field<Foo3::F, std::uint32_t>>;
+using FooGroup3 = Group<Field<Foo3::F, std::uint32_t>>;
 
-using FooFrame = Frame<FooPacket1, FooPacket2, FooPacket3>;
+using FooFrame = Frame<FooGroup1, FooGroup2, FooGroup3>;
 
 TEST(Frame, inject)
 {

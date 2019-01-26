@@ -34,7 +34,7 @@ enum class Foo
 
 using namespace gbee;
 
-using FooPacket = Packet<Field<Foo::A, std::uint16_t>,
+using FooGroup = Group<Field<Foo::A, std::uint16_t>,
                          Field<Foo::B, std::uint32_t>,
                          Field<Foo::C, std::uint8_t>,
                          Field<Foo::D, std::uint64_t>,
@@ -48,60 +48,60 @@ TEST(Field, validate)
    EXPECT_TRUE((std::is_same_v<Bar::value_type, uint16_t>) );
 }
 
-TEST(Packet, inject)
+TEST(Group, inject)
 {
    std::array<std::uint8_t, 16> buffer{{0}};
-   static_assert(buffer.size() == FooPacket::size);
+   static_assert(buffer.size() == FooGroup::size);
 
    const std::uint16_t a_value{0x1111};
-   FooPacket::inject<Foo::A>(buffer.data(), buffer.size(), a_value);
+   FooGroup::inject<Foo::A>(buffer.data(), buffer.size(), a_value);
    EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
 
    const std::uint32_t b_value{0x22222222};
-   FooPacket::inject<Foo::B>(buffer.data(), buffer.size(), b_value);
+   FooGroup::inject<Foo::B>(buffer.data(), buffer.size(), b_value);
    EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00,
                                               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
 
    const std::uint8_t c_value{0x33};
-   FooPacket::inject<Foo::C>(buffer.data(), buffer.size(), c_value);
+   FooGroup::inject<Foo::C>(buffer.data(), buffer.size(), c_value);
    EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x00, 0x00,
                                               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
 
    const std::uint64_t d_value{0x4444444444444444};
-   FooPacket::inject<Foo::D>(buffer.data(), buffer.size(), d_value);
+   FooGroup::inject<Foo::D>(buffer.data(), buffer.size(), d_value);
    EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x44, 0x44,
                                               0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x00));
 
    const std::uint8_t e_value{0x55};
-   FooPacket::inject<Foo::E>(buffer.data(), buffer.size(), e_value);
+   FooGroup::inject<Foo::E>(buffer.data(), buffer.size(), e_value);
    EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x44, 0x44,
                                               0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x55));
 }
 
-TEST(Packet, extract)
+TEST(Group, extract)
 {
    const std::array<uint8_t, 16> buffer{{0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x44, 0x44, 0x44,
                                          0x44, 0x44, 0x44, 0x44, 0x44, 0x55}};
-   static_assert(buffer.size() == FooPacket::size);
+   static_assert(buffer.size() == FooGroup::size);
 
    std::uint16_t a_value{0};
-   FooPacket::extract<Foo::A>(buffer.data(), buffer.size(), a_value);
+   FooGroup::extract<Foo::A>(buffer.data(), buffer.size(), a_value);
    EXPECT_EQ(a_value, 0x1111);
 
    std::uint32_t b_value{0};
-   FooPacket::extract<Foo::B>(buffer.data(), buffer.size(), b_value);
+   FooGroup::extract<Foo::B>(buffer.data(), buffer.size(), b_value);
    EXPECT_EQ(b_value, 0x22222222);
 
    std::uint8_t c_value{0};
-   FooPacket::extract<Foo::C>(buffer.data(), buffer.size(), c_value);
+   FooGroup::extract<Foo::C>(buffer.data(), buffer.size(), c_value);
    EXPECT_EQ(c_value, 0x33);
 
    std::uint64_t d_value{0};
-   FooPacket::extract<Foo::D>(buffer.data(), buffer.size(), d_value);
+   FooGroup::extract<Foo::D>(buffer.data(), buffer.size(), d_value);
    EXPECT_EQ(d_value, 0x4444444444444444);
 
    std::uint8_t e_value{0};
-   FooPacket::extract<Foo::E>(buffer.data(), buffer.size(), e_value);
+   FooGroup::extract<Foo::E>(buffer.data(), buffer.size(), e_value);
    EXPECT_EQ(e_value, 0x55);
 }

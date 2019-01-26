@@ -82,11 +82,11 @@ struct Field
 };
 
 template<typename... Fields>
-struct Packet
+struct Group
 {
    static_assert(are_values_unique<Fields::id...>);
 
-   Packet() = delete;
+   Group() = delete;
 
    template<auto id>
    struct lookup_field : public details::packet::lookup_field<id, Fields...>::type
