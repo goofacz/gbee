@@ -81,7 +81,7 @@ class Frame
    {};
 
  public:
-   static constexpr std::size_t size{(lookup_packet<typename Packets::Id>::size + ...)};
+   static constexpr std::size_t size{(lookup_packet<typename Packets::id_type>::size + ...)};
 
    template<std::size_t array_size>
    explicit Frame(std::array<std::uint8_t, array_size>& initial_buffer)

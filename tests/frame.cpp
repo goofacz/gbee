@@ -57,7 +57,7 @@ TEST(Frame, inject)
    std::array<std::uint8_t, 20> buffer{{0}};
 
    FooFrame frame{buffer};
-   // static_assert(buffer.size() >= FooFrame::size);
+   static_assert(buffer.size() == FooFrame::size);
 
    const std::uint16_t a_value{0x1111};
    frame.inject<Foo1::A>(a_value);
@@ -102,7 +102,7 @@ TEST(Field, extract)
                                    0x44, 0x44, 0x44, 0x44, 0x44, 0x55, 0x66, 0x66, 0x66, 0x66}};
 
    FooFrame frame{buffer};
-   // static_assert(buffer.size() >= FooPacket::size);
+   static_assert(buffer.size() == FooFrame::size);
 
    std::uint16_t a_value{0};
    frame.extract<Foo1::A>(a_value);

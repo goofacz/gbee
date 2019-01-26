@@ -51,7 +51,7 @@ TEST(Field, validate)
 TEST(Packet, inject)
 {
    std::array<std::uint8_t, 16> buffer{{0}};
-   static_assert(buffer.size() >= FooPacket::size);
+   static_assert(buffer.size() == FooPacket::size);
 
    const std::uint16_t a_value{0x1111};
    FooPacket::inject<Foo::A>(buffer.data(), buffer.size(), a_value);
@@ -83,7 +83,7 @@ TEST(Packet, extract)
 {
    const std::array<uint8_t, 16> buffer{{0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x44, 0x44, 0x44,
                                          0x44, 0x44, 0x44, 0x44, 0x44, 0x55}};
-   static_assert(buffer.size() >= FooPacket::size);
+   static_assert(buffer.size() == FooPacket::size);
 
    std::uint16_t a_value{0};
    FooPacket::extract<Foo::A>(buffer.data(), buffer.size(), a_value);
