@@ -20,5 +20,5 @@
 #pragma once
 
 #include <gbee/frame.hpp>
-#include <gbee/helpers.hpp>
 #include <gbee/group.hpp>
+#include <gbee/helpers.hpp>

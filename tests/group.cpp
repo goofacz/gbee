@@ -35,10 +35,10 @@ enum class Foo
 using namespace gbee;
 
 using FooGroup = Group<Field<Foo::A, std::uint16_t>,
-                         Field<Foo::B, std::uint32_t>,
-                         Field<Foo::C, std::uint8_t>,
-                         Field<Foo::D, std::uint64_t>,
-                         Field<Foo::E, std::uint8_t>>;
+                       Field<Foo::B, std::uint32_t>,
+                       Field<Foo::C, std::uint8_t>,
+                       Field<Foo::D, std::uint64_t>,
+                       Field<Foo::E, std::uint8_t>>;
 
 TEST(Field, validate)
 {
