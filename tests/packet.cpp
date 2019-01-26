@@ -25,16 +25,20 @@
 
 enum class Foo
 {
-   A = 4,
+   A,
    B,
    C,
-   D
+   D,
+   E
 };
 
 using namespace gbee;
 
-using FooPacket =
-  Packet<Field<Foo::A, std::uint16_t>, Field<Foo::B, std::uint32_t>, Field<Foo::C, std::uint8_t>>;
+using FooPacket = Packet<Field<Foo::A, std::uint16_t>,
+                         Field<Foo::B, std::uint32_t>,
+                         Field<Foo::C, std::uint8_t>,
+                         Field<Foo::D, std::uint64_t>,
+                         Field<Foo::E, std::uint8_t>>;
 
 TEST(Field, validate)
 {
@@ -46,9 +50,58 @@ TEST(Field, validate)
 
 TEST(Field, inject)
 {
-   std::uint32_t value{0xabcdef12};
-   std::array<std::uint8_t, 7> buffer{{0}};
+   std::array<std::uint8_t, 16> buffer{{0}};
+   static_assert(buffer.size() >= FooPacket::size);
 
-   FooPacket::inject<Foo::B>(buffer, value);
-   EXPECT_THAT(buffer, ::testing::ElementsAre(0x00, 0x00, 0x12, 0xef, 0xcd, 0xab, 0x00));
+   const std::uint16_t a_value{0x1111};
+   FooPacket::inject<Foo::A>(buffer.data(), buffer.size(), a_value);
+   EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
+
+   const std::uint32_t b_value{0x22222222};
+   FooPacket::inject<Foo::B>(buffer.data(), buffer.size(), b_value);
+   EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00,
+                                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
+
+   const std::uint8_t c_value{0x33};
+   FooPacket::inject<Foo::C>(buffer.data(), buffer.size(), c_value);
+   EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x00, 0x00,
+                                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
+
+   const std::uint64_t d_value{0x4444444444444444};
+   FooPacket::inject<Foo::D>(buffer.data(), buffer.size(), d_value);
+   EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x44, 0x44,
+                                              0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x00));
+
+   const std::uint8_t e_value{0x55};
+   FooPacket::inject<Foo::E>(buffer.data(), buffer.size(), e_value);
+   EXPECT_THAT(buffer, ::testing::ElementsAre(0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x44, 0x44,
+                                              0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x55));
+}
+
+TEST(Field, extract)
+{
+   const std::array<uint8_t, 16> buffer{{0x11, 0x11, 0x22, 0x22, 0x22, 0x22, 0x33, 0x44, 0x44, 0x44,
+                                         0x44, 0x44, 0x44, 0x44, 0x44, 0x55}};
+   static_assert(buffer.size() >= FooPacket::size);
+
+   std::uint16_t a_value{0};
+   FooPacket::extract<Foo::A>(buffer.data(), buffer.size(), a_value);
+   EXPECT_EQ(a_value, 0x1111);
+
+   std::uint32_t b_value{0};
+   FooPacket::extract<Foo::B>(buffer.data(), buffer.size(), b_value);
+   EXPECT_EQ(b_value, 0x22222222);
+
+   std::uint8_t c_value{0};
+   FooPacket::extract<Foo::C>(buffer.data(), buffer.size(), c_value);
+   EXPECT_EQ(c_value, 0x33);
+
+   std::uint64_t d_value{0};
+   FooPacket::extract<Foo::D>(buffer.data(), buffer.size(), d_value);
+   EXPECT_EQ(d_value, 0x4444444444444444);
+
+   std::uint8_t e_value{0};
+   FooPacket::extract<Foo::E>(buffer.data(), buffer.size(), e_value);
+   EXPECT_EQ(e_value, 0x55);
 }

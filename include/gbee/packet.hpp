@@ -96,22 +96,28 @@ class Packet
 
    static constexpr std::size_t size{(lookup_field<Fields::id>::size + ...)};
 
-   template<auto id, std::size_t buffer_size>
+   template<auto id, typename T>
    static void
-   inject(std::array<std::uint8_t, buffer_size>& buffer,
-          const field_value_type<id>& value,
+   inject(std::uint8_t* buffer,
+          std::size_t buffer_size,
+          const T& value,
           std::size_t base_offset = 0)
    {
-      static_assert(buffer_size >= size);
+      static_assert(std::is_same_v<T, field_value_type<id>>);
       const size_t field_offset{base_offset + offset<id>::value};
-      std::memcpy(buffer.data() + field_offset, &value, lookup_field<id>::size);
+      std::memcpy(buffer + field_offset, &value, lookup_field<id>::size);
    }
 
-   template<auto id>
+   template<auto id, typename T>
    static void
-   extract(field_value_type<id>& value, std::size_t base_offset = 0)
+   extract(const std::uint8_t* buffer,
+           std::size_t buffer_size,
+           T& value,
+           std::size_t base_offset = 0)
    {
-      std::memcpy(&value, (void*) (0 + base_offset + offset<id>::value), lookup_field<id>::size);
+      static_assert(std::is_same_v<T, field_value_type<id>>);
+      const size_t field_offset{base_offset + offset<id>::value};
+      std::memcpy(&value, buffer + field_offset, lookup_field<id>::size);
    }
 };
 
