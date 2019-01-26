@@ -64,11 +64,18 @@ template<auto id, typename... Fields>
 struct offset : public offset_helper<false, id, 0, Fields...>
 {};
 
+template<typename Field, typename... Fields>
+struct extract_field_id_type
+{
+   using type = typename Field::id_type;
+};
+
 } // namespace details::packet
 
 template<auto initial_id, typename T>
 struct Field
 {
+   using id_type = std::decay_t<decltype(initial_id)>;
    using value_type = T;
    static constexpr auto id{initial_id};
    static constexpr std::size_t size{sizeof(value_type)};
@@ -92,7 +99,7 @@ struct Packet
    template<auto id>
    using field_value_type = typename lookup_field<id>::value_type;
 
-   using id_type = std::decay_t<decltype((Fields::id, ...))>;
+   using id_type = typename details::packet::extract_field_id_type<Fields...>::type;
 
    static constexpr std::size_t size{(lookup_field<Fields::id>::size + ...)};
 
