@@ -92,7 +92,7 @@ class Packet
    using field_valie_type = typename lookup_field<id>::value_type;
 
  public:
-   using id_type = std::decay_t<decltype((Fields::id, ...))>;
+   using id_type = std::tuple_element_t<0, std::tuple<decltype(Fields::id)...>>;
 
    static constexpr std::size_t size{(lookup_field<Fields::id>::size + ...)};
 
