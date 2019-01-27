@@ -65,7 +65,7 @@ struct offset : public offset_helper<false, Id, 0, Groups...>
 
 } // namespace details::frame
 
-template<typename... Groups>
+template<std::size_t extra_size, typename... Groups>
 class Frame
 {
    static_assert(are_types_unique<typename Groups::id_type...>);
@@ -92,7 +92,7 @@ class Frame
    bool
    has_valid_buffer_size() const
    {
-      return buffer_size >= size;
+      return buffer_size >= (size + extra_size);
    }
 
    template<auto id, typename T>
